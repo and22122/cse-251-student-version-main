@@ -62,33 +62,44 @@ call_count = 0
 
 # TODO Add your threaded class definition here
 def Request_thread(threading.Thread):
-    def __init__(self, url):
+    def __init__(self, url, print_data = False):
         threading.Thread.__init__(self)
         self.url = url
         self.response = None
         self.data = None
+        self.do_print = print_data
     
     def run(self):
         self.response = requests.get(self.url)
 
         if self.response.status_code == 200:
             self.data = self.response.json()
+
+            if self.do_print:
+                print(self.data)
         else:
             print("The best laid code... gang aft agley.")
 
 # TODO Add any functions you need here
-#request data
+Threads = []
 
 def main():
     log = Log(show_terminal=True)
     log.start_timer('Starting to retrieve data from the server')
 
     # TODO Retrieve Top API urls
+    db = Request_thread(TOP_API_URL, True)
 
+    db.start();
+    db.join();
 
     # TODO Retrieve Details on film 6
 
     # TODO Display results
+
+    for i in Threads:
+        i.start()
+        i.join()
 
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
