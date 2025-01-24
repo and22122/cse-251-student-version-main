@@ -2,7 +2,11 @@
 Course: CSE 251 
 Lesson: L02 Prove
 File:   prove.py
-Author: <Add name here>
+Author: Jalen Anderson
+Self rating: 3-4 I did my best to meet the requirements despite several struggles.
+Although the program may currently take too long to run, I did manage at one point
+to bring its run time down significantly, from about 210 seconds to 94 or fewer
+seconds.
 
 Purpose: Retrieve Star Wars details from a server
 
