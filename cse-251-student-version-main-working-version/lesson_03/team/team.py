@@ -22,7 +22,7 @@ import copy
 import time
 
 # Include cse 251 common Python files
-from cse251 import *
+from cse251 import *    
 
 words = ['BOOKMARK', 'SURNAME', 'RETHINKING', 'HEAVY', 'IRONCLAD', 'HAPPY', 
         'JOURNAL', 'APPARATUS', 'GENERATOR', 'WEASEL', 'OLIVE', 
@@ -149,6 +149,20 @@ def main():
     board.display()
 
     start = time.perf_counter()
+        
+    threads = []
+    processes = []
+
+    for word in words:
+        processes.append(mp.Process(target=board.find_word, args=(word,)))
+
+    for process in processes:
+        process.start()
+        process.join()
+    
+    with mp.Pool(2) as p:
+        p.map()
+
     for word in words:
         if not board.find_word(word):
             print(f'Error: Could not find "{word}"')

@@ -61,7 +61,7 @@ call_count = 0
 
 
 # TODO Add your threaded class definition here
-def Request_thread(threading.Thread):
+class Request_thread(threading.Thread):
     def __init__(self, url, print_data = False):
         threading.Thread.__init__(self)
         self.url = url
@@ -79,27 +79,107 @@ def Request_thread(threading.Thread):
                 print(self.data)
         else:
             print("The best laid code... gang aft agley.")
-
 # TODO Add any functions you need here
-Threads = []
 
 def main():
+    call_count = 0
+
     log = Log(show_terminal=True)
     log.start_timer('Starting to retrieve data from the server')
 
     # TODO Retrieve Top API urls
-    db = Request_thread(TOP_API_URL, True)
+    db = Request_thread(TOP_API_URL)
 
     db.start();
     db.join();
 
+    call_count += 1
+
     # TODO Retrieve Details on film 6
+    film = Request_thread(db.data['films'] + "6")
 
+    film.start()
+    film.join()
+
+    call_count += 1
+    
+    print('-' * 40)
+    print(f"Title   : {film.data['title']}")
+    print(f"Director: {film.data['director']}")
+    print(f"Producer: {film.data['producer']}")
+    print(f"Released: {film.data['release_date']}\n")
+    
     # TODO Display results
+    print(f"Characters: {len(film.data['characters'])}")
 
-    for i in Threads:
-        i.start()
-        i.join()
+    threads = []
+
+    for i in range(len(film.data['characters'])):
+        threads.append(Request_thread(film.data['characters'][i]))
+        threads[i].start()
+        threads[i].join()
+        call_count += 1
+    for i in range(len(threads)):
+        threads[i] = threads[i].data['name']
+
+    print(f"{", ".join(sorted(threads))}\n")
+
+    
+    print(f"Planets: {len(film.data['planets'])}")
+
+    threads = []
+    for i in range(len(film.data['planets'])):
+        threads.append(Request_thread(film.data['planets'][i]))
+        threads[i].start()
+        threads[i].join()
+        call_count += 1
+    for i in range(len(threads)):
+        threads[i] = threads[i].data['name']
+    
+    print(f"{", ".join(sorted(threads))}\n")
+
+    
+    print(f"Starships: {len(film.data['starships'])}")
+
+    threads = []
+    for i in range(len(film.data['starships'])):
+        threads.append(Request_thread(film.data['starships'][i]))
+        threads[i].start()
+        threads[i].join()
+        call_count += 1
+    for i in range(len(threads)):
+        threads[i] = threads[i].data['name']
+    
+    print(f"{", ".join(sorted(threads))}\n")
+
+    
+    print(f"Vehicles: {len(film.data['vehicles'])}")
+
+    threads = []
+    for i in range(len(film.data['vehicles'])):
+        threads.append(Request_thread(film.data['vehicles'][i]))
+        threads[i].start()
+        threads[i].join()
+        call_count += 1
+    for i in range(len(threads)):
+        threads[i] = threads[i].data['name']
+    
+    print(f"{", ".join(sorted(threads))}\n")
+
+    
+    print(f"Species: {len(film.data['species'])}")
+
+    threads = []
+    for i in range(len(film.data['species'])):
+        threads.append(Request_thread(film.data['species'][i]))
+        threads[i].start()
+        threads[i].join()
+        call_count += 1
+    for i in range(len(threads)):
+        threads[i] = threads[i].data['name']
+    
+    print(f"{", ".join(sorted(threads))}\n")
+    
 
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
