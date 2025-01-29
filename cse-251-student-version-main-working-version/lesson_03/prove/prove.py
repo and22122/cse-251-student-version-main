@@ -65,6 +65,8 @@ def create_new_frame(image_file, green_file, process_file):
     image_new = Image.composite(image_img, green_img, mask_img)
     image_new.save(process_file)
 
+def process_Frames(files):
+    create_new_frame(files[0], files[1], files[2])
 
 def main():
     all_process_time = timeit.default_timer()
@@ -73,7 +75,18 @@ def main():
     xaxis_cpus = []
     yaxis_times = []
 
+    frameInfo = []
+
+    for i in range(1, FRAME_COUNT + 1):
+        frameInfo.append((f'elephant/image{i:03d}.png', f'green/image{i:03d}.png', f'processed/image{i:03d}.png'))
+
     # TODO Process all frames trying 1 cpu, then 2, then 3, ... to CPU_COUNT
+    for i in range(1, CPU_COUNT + 1):
+        start_time = timeit.default_timer()
+        with mp.Pool(i) as p:
+            p.map(process_Frames, frameInfo)
+        xaxis_cpus.append(i)
+        yaxis_times.append(timeit.default_timer() - start_time)
 
     # sample code: remove before submitting  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # process one frame #10
