@@ -35,15 +35,17 @@ def retrieve_thread(que, log):  # TODO add arguments
 
         if result == NO_MORE_VALUES:
             return
+        else:
+            response = requests.get(result)
 
-        # TODO process the value retrieved from the queue
+            if response.status_code == 200:
+                data = response.json()
 
-        # TODO make Internet call to get characters name and log it
-        data = requests.get(f'{result}').json
+                log.write(data['name'])
+            else:
+                print("You know by know... gang aft agley.")
 
-        log.write(data['name'])
         pass
-
 
 
 def file_reader(que, log, filename): # TODO add arguments
