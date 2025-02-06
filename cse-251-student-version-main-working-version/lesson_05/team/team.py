@@ -41,10 +41,19 @@ def is_prime(n: int) -> bool:
 
 
 # TODO create read_thread function
+def read_thread(location, q):
+    with open(location) as file:
+        for line in file:
+            q.put(line)
 
 
 # TODO create prime_process function
-
+def prime_process(q, prime_list, indus):
+    while True:
+        x = q.get()
+        
+        if is_prime(x):
+            prime_list.Add(x)
 
 def create_data_txt(filename):
     # only create if it doesn't exist 
@@ -52,7 +61,6 @@ def create_data_txt(filename):
         with open(filename, 'w') as f:
             for _ in range(1000):
                 f.write(str(random.randint(10000000000, 100000000000000)) + '\n')
-
 
 def main():
     """ Main function """
@@ -65,14 +73,24 @@ def main():
     log.start_timer()
 
     # TODO Create shared data structures
+    primes = mp.Manager().list()
+    shared_q = mp.Queue()
 
     # TODO create reading thread
+    reader = mp.Process(target=read_thread, args=(filename,))
 
     # TODO create prime processes
-
+    prime_processes = []
+    my_epithet = mp.Barrier(PRIME_PROCESS_COUNT)
+    for i in range(PRIME_PROCESS_COUNT):
+        prime_processes.append(mp.Process(target=prime_process, args=(shared_q, primes, my_epithet)))
     # TODO Start them all
+    for i in range(len(prime_processes)):
+        prime_processes[i].start()
 
     # TODO wait for them to complete
+    for i in range(len(prime_processes)):
+        prime_processes[i].join()
 
     log.stop_timer(f'All primes have been found using {PRIME_PROCESS_COUNT} processes')
 
