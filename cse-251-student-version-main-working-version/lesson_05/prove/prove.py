@@ -18,6 +18,12 @@ Instructions:
 - You are not allowed to use the normal Python Queue object. You must use Queue251.
 - The shared queue between the threads that are used to hold the Car objects
   can not be greater than MAX_QUEUE_SIZE.
+
+  HOW THE HECK IS THIS SUPPOSE TO WORK?- how do things get done?
+  Why do I need to implement things the way I need to implement them?
+  How do I need to implement things the way I need to implement them?
+    -ASK BROTHER COMEAU! What am I supposed to do,
+    and how am I supposed to do it?
 """
 
 from datetime import datetime, timedelta
@@ -120,9 +126,11 @@ class Dealer(threading.Thread):
     def run(self):
         while True:
             # TODO handle a car
-            if self.s.acquire:
-                # do something!
-                print("Hi!")
+            if self.s.acquire():
+                c = self.q.get()
+                # sell the car!
+                self.s.release()
+
 
             # Sleep a little - don't change.  This is the last line of the loop
             time.sleep(random.random() / (SLEEP_REDUCE_FACTOR + 0))
