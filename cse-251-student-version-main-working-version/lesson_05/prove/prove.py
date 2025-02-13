@@ -94,17 +94,22 @@ class Queue251():
 class Factory(threading.Thread):
     """ This is a factory.  It will create cars and place them on the car queue """
 
-    def __init__(self, id, q, bar, sema):
+    def __init__(self, id, q, bar, insem, outsem):
         self.cars_to_produce = random.randint(200, 300) # DO NOT change
         self.q = q
-        self.b = bar
-        self.s = sema
+        self.bar = bar
+        self.s = outsem
+        self.i = insem
 
     def run(self):
         # TODO produce the cars, the send them to the dealerships
         # make car if production limit hasn't been hit, increase
         # queue semaphore, put car in queue, track production
         # TODO wait until all of the factories are finished producing cars
+        while true:
+            self.i.acquire()
+
+            if (self.q == )
         self.b.wait()
 
         # TODO "Wake up/signal" the dealerships one more time.  Select one factory to do this
