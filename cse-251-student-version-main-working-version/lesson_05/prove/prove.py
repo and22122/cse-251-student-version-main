@@ -106,10 +106,14 @@ class Factory(threading.Thread):
         # make car if production limit hasn't been hit, increase
         # queue semaphore, put car in queue, track production
         # TODO wait until all of the factories are finished producing cars
-        while true:
+        while True:
             self.i.acquire()
 
-            if (self.q == )
+            if (self.insem < 0 or self.insem > MAX_QUEUE_SIZE):
+                break
+            else:
+                self.q.put(Car())
+                self.s.release()
         self.b.wait()
 
         # TODO "Wake up/signal" the dealerships one more time.  Select one factory to do this
@@ -122,20 +126,19 @@ class Factory(threading.Thread):
 class Dealer(threading.Thread):
     """ This is a dealer that receives cars """
 
-    def __init__(self, id, q, sema):
+    def __init__(self, id, q, outsem, insem):
         self.q = q
         self.id = id
-        self.s = sema
-        pass
+        self.s = outsem
+        self.i = insem;
 
     def run(self):
         while True:
             # TODO handle a car
-            if self.s.acquire():
-                c = self.q.get()
-                # sell the car!
-                self.s.release()
-
+            self.i.acquire()
+            c = self.q.get()
+            # sell the car!
+            self.s.release()
 
             # Sleep a little - don't change.  This is the last line of the loop
             time.sleep(random.random() / (SLEEP_REDUCE_FACTOR + 0))
@@ -163,11 +166,11 @@ def run_production(factory_count, dealer_count):
     # TODO create your factories, each factory will create a random amount of cars; your code must account for this.
     # NOTE: You have no control over how many cars a factory will create in this assignment.
     for i in range(factory_count):
-        processes.append(mp.Process(target=Factory, args=(i,  Queue251, indus, sem)))
+        processes.append(mp.Process(target=Factory, args=(i,  Queue251, indus, capacity, qsize)))
 
     # TODO create your dealerships
     for i in range(dealer_count):
-        processes.append(mp.Process(target=Dealer, args=(i, Queue251, indus)))
+        processes.append(mp.Process(target=Dealer, args=(i, Queue251, capacity, qsize)))
 
     log.start_timer()
 
