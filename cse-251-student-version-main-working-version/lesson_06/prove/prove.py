@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L06 Prove
 File:   prove.py
-Author: <Add name here>
+Author: <Jalen Anderson>
 
 Purpose: Processing Plant
 
@@ -88,9 +88,10 @@ class Marble_Creator(mp.Process):
         'Brown', 'Gold', 'Blue-Green', 'Antique Bronze', 'Mint Green', 'Royal Blue', 
         'Light Orange', 'Pastel Blue', 'Middle Green')
 
-    def __init__(self):
+    def __init__(self, out):
         mp.Process.__init__(self)
         # TODO Add any arguments and variables here
+        self.outPipe = out
 
     def run(self):
         '''
@@ -100,15 +101,24 @@ class Marble_Creator(mp.Process):
             sleep the required amount
         Let the bagger know there are no more marbles
         '''
+        self.outPipe.send(self.colors[random.randint(0, len(self.colors) - 1)])
+        
         pass
 
 
 class Bagger(mp.Process):
     """ Receives marbles from the marble creator, then there are enough
         marbles, the bag of marbles are sent to the assembler """
-    def __init__(self):
+    def __init__(self, tracker, max_marbles, bagsize, inp, out):
         mp.Process.__init__(self)
         # TODO Add any arguments and variables here
+        self.tracker = tracker
+        self.max_marbles = max_marbles
+        self.size = bagsize
+        self.counter = 0
+        self.bag = Bag()
+        self.inPipe = inp
+        self.outPipe = out
 
     def run(self):
         '''
@@ -118,6 +128,19 @@ class Bagger(mp.Process):
             sleep the required amount
         tell the assembler that there are no more bags
         '''
+        while self.tracker <= self.max_marbles:
+            if self.counter == self.bagsize:
+                self.outPipe.send(self.bag)
+                self.bag = Bag()
+            else:
+                self.tracker += 1
+                self.bag.add(self.inPipe.receive())
+        if self.bag.get_size > 0:
+            self.outPipe.send(self.bag)
+        self.outPipe.send()
+                
+
+
 
 
 class Assembler(mp.Process):
@@ -152,6 +175,8 @@ class Wrapper(mp.Process):
             save gift to the file with the current time
             sleep the required amount
         '''
+        while True:
+
 
 
 def display_final_boxes(filename, log):
@@ -187,8 +212,11 @@ def main():
     log.write(f'Wrapper delay    = {settings[WRAPPER_DELAY]}')
 
     # TODO: create Pipes between creator -> bagger -> assembler -> wrapper
-
+    creator_pipe, bag_hopper = mp.Pipe()
+    bag_pipe, assembler_hopper = mp.Pipe()
+    assembler_pipe, wrapper_hopper = mp.Pipe()
     # TODO create variable to be used to count the number of gifts
+    gift_counter = mp.Value('i', 0)
 
     # delete final boxes file
     if os.path.exists(BOXES_FILENAME):
@@ -197,6 +225,7 @@ def main():
     log.write('Create the processes')
 
     # TODO Create the processes (ie., classes above)
+    
 
     log.write('Starting the processes')
     # TODO add code here
@@ -207,6 +236,7 @@ def main():
     display_final_boxes(BOXES_FILENAME, log)
     
     # TODO Log the number of gifts created.
+    log.write(f"{gift_counter.value} gifts created.")
 
     log.stop_timer(f'Total time')
 

@@ -102,4 +102,4 @@ if __name__ == "__main__":
     copy_file(log, 'gettysburg.txt', 'gettysburg-copy.txt')
     
     # After you get the gettysburg.txt file working, uncomment this statement
-    # copy_file(log, 'bom.txt', 'bom-copy.txt')
+    copy_file(log, 'bom.txt', 'bom-copy.txt')
