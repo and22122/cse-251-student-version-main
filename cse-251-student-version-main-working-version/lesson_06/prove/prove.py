@@ -104,7 +104,7 @@ class Marble_Creator(mp.Process):
             sleep the required amount
         Let the bagger know there are no more marbles
         '''
-        while self.tracker.value <= self.max_marbles:
+        while self.tracker.value < self.max_marbles:
             self.outPipe.send(self.colors[random.randint(0, len(self.colors) - 1)])
             self.tracker.value += 1
             time.sleep(self.sleeptime)
@@ -118,7 +118,7 @@ class Bagger(mp.Process):
     def __init__(self, sleeptime, inp, out, bagsize):
         mp.Process.__init__(self)
         # TODO Add any arguments and variables here
-        self.size = bagsize
+        self.bag_size = bagsize
         self.counter = 0
         self.bag = Bag()
         self.inPipe = inp
@@ -134,16 +134,15 @@ class Bagger(mp.Process):
         tell the assembler that there are no more bags
         '''
         while True:
-            result = self.inPipe.receive()
+            result = self.inPipe.recv()
             if result == -1:
                 break
-            elif self.counter == self.bag_size:
-                self.outPipe .send(self.bag)
+            elif self.bag.get_size() == self.bag_size:
+                self.outPipe.send(self.bag)
                 self.bag = Bag()
                 time.sleep(self.sleeptime)
-            else {
-                self.bag.add(self.inPipe.receive())
-            }
+            else:
+                self.bag.add(result)
         self.outPipe.send(-1)
 
 
@@ -168,11 +167,13 @@ class Assembler(mp.Process):
         tell the wrapper that there are no more gifts
         '''
         while True:
-            result = self.inPipe.receive()
+            result = self.inPipe.recv()
             if result == -1:
                 break
             else:
-                largeMarble = self.marble_names[random.randint(0, len(self.marble_names))]
+                marblemax = len(self.marble_names) - 1
+                namenum = random.randint(0, marblemax)
+                largeMarble = self.marble_names[namenum]
                 self.outPipe.send(Gift(largeMarble, result))
                 time.sleep(self.sleeptime)
         self.outPipe.send(-1)
@@ -195,11 +196,11 @@ class Wrapper(mp.Process):
         '''
         with open(self.filename, "w") as file:
             while True:
-                result = self.inPipe.receive()
+                result = self.inPipe.recv()
                 if result == -1:
                     break
                 else:
-                    file.write(f"Created - {datetime.now().time()}: {str(result)}")
+                    file.write(f"Created - {datetime.now().time()}: {str(result)}\n")
                     time.sleep(self.sleeptime)
 
 
