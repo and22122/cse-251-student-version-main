@@ -15,6 +15,13 @@ Note: each of the 5 task functions need to return a string.  They should not pri
 
 TODO:
 
+The name task seems to be the only one that isn't number crunching, so I think it needs more cores.
+That being said, I also tested with different pool sizes to see which turned out to be fastest.
+Previous experience tells me that 3 cores is probably a good starting point parallel processing on my computer.
+
+After testing, It seems that the fastest configuration was a pool size of 1 for every task.
+That doesn't seem right to me, but those were the results I got.
+
 Add your comments here on the pool sizes that you used for your assignment and why they were the best choices.
 """
 
@@ -41,7 +48,7 @@ TYPE_NAME   = 'name'
 PRIME_POOL_SIZE = 1
 WORD_POOL_SIZE  = 1
 UPPER_POOL_SIZE = 1
-SUM_POOL_SIZE   = 3
+SUM_POOL_SIZE   = 1
 NAME_POOL_SIZE  = 1
 
 # Global lists to collect the task results
