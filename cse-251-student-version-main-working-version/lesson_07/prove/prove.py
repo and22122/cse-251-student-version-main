@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L07 Prove
 File:   prove.py
-Author: <Add name here>
+Author: Jalen Anderson
 
 Purpose: Process Task Files.
 
@@ -41,7 +41,7 @@ TYPE_NAME   = 'name'
 PRIME_POOL_SIZE = 1
 WORD_POOL_SIZE  = 1
 UPPER_POOL_SIZE = 1
-SUM_POOL_SIZE   = 1
+SUM_POOL_SIZE   = 3
 NAME_POOL_SIZE  = 1
 
 # Global lists to collect the task results
@@ -122,6 +122,21 @@ def main():
     log.start_timer()
 
     # TODO Create process pools
+    pool1 = mp.Pool(PRIME_POOL_SIZE)
+    pool2 = mp.Pool(WORD_POOL_SIZE)
+    pool3 = mp.Pool(UPPER_POOL_SIZE)
+    pool4 = mp.Pool(SUM_POOL_SIZE)
+    pool5 = mp.Pool(NAME_POOL_SIZE)
+    results1 = []
+    results2 = []
+    results3 = []
+    results4 = []
+    results5 = []
+    output1 = []
+    output2 = []
+    output3 = []
+    output4 = []
+    output5 = []
 
     # TODO change the following if statements to start the pools
     
@@ -135,19 +150,31 @@ def main():
         count += 1
         task_type = task['task']
         if task_type == TYPE_PRIME:
-            task_prime(task['value'])
+            result_primes.append(pool1.apply_async(task_prime, args=(task['value'],)))
         elif task_type == TYPE_WORD:
-            task_word(task['word'])
+            result_words.append(pool2.apply_async(task_word, args=(task['word'],)))
         elif task_type == TYPE_UPPER:
-            task_upper(task['text'])
+            result_upper.append(pool3.apply_async(task_upper, args=(task['text'])))
         elif task_type == TYPE_SUM:
-            task_sum(task['start'], task['end'])
+            result_sums.append(pool4.apply_async(task_sum, args=(task['start'], task['end'])))
         elif task_type == TYPE_NAME:
+            result_names.append(pool5.apply_async(task_name, args=(task['url'],)))
             task_name(task['url'])
         else:
             log.write(f'Error: unknown task type {task_type}')
 
     # TODO wait on the pools
+    pool1.close()
+    pool2.close()
+    pool3.close()
+    pool4.close()
+    pool5.close()
+
+    pool1.join()
+    pool2.join()
+    pool3.join()
+    pool4.join()
+    pool5.join()
 
     # DO NOT change any code below this line!
     #---------------------------------------------------------------------------
