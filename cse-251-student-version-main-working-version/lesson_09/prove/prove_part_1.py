@@ -36,7 +36,12 @@ def solve_path(maze):
     path = []
     # TODO: Solve the maze recursively while tracking the correct path.
 
+    def IsEnd(x, y):
+        return self._screen_w * 
+
     # Hint: You can create an inner function to do the recursion
+    def Solve(x = 0, y = 0, currPath = []):
+        currPath.append(x, y)
 
     return path
 
