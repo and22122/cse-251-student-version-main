@@ -35,16 +35,36 @@ def solve_path(maze):
         The path is a list of positions, (x, y) """
     path = []
     # TODO: Solve the maze recursively while tracking the correct path.
-
-    def IsEnd(x, y):
-        return self._screen_w * 
+    def __init__(self, screen, width, height, bitmap_file, delay=False):
+        super.__init__(screen, width, height, bitmap_file, delay)
 
     # Hint: You can create an inner function to do the recursion
-    def Solve(x = 0, y = 0, currPath = []):
-        currPath.append(x, y)
+    def Solve(self, x = "", y = "", currPath = [], traversed = []):
+        if x == "" and y == "":
+            x = self.get_start_pos[0]
+            y = self.get_start_pos[1]
+        elif (x, y) not in traversed:
+            traversed.append((x, y))
+            currPath.append((x, y))
+            self.move(x, y, (128, 128, 128))
+            self.restore(x, y)
 
-    return path
+        if self.at_end():
+            path = currPath
+            return path
+        else:
+            m = self.get_possible_moves[x, y]
+            for i in range(m):
+                Solve(self, m[i][0], m[i][1], currPath)
+                currPath.RemoveAt(currPath.Count - 1)
+    def __run__(self):
+        self.Solve()
 
+        if path == []:
+            print("Uh-oh. No valid path found.")
+            return path
+    
+    __run__()
 
 def get_path(log, filename):
     """ Do not change this function """
