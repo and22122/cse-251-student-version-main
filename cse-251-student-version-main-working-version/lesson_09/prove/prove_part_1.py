@@ -35,36 +35,39 @@ def solve_path(maze):
         The path is a list of positions, (x, y) """
     path = []
     # TODO: Solve the maze recursively while tracking the correct path.
-    def __init__(self, screen, width, height, bitmap_file, delay=False):
-        super.__init__(screen, width, height, bitmap_file, delay)
 
     # Hint: You can create an inner function to do the recursion
-    def Solve(self, x = "", y = "", currPath = [], traversed = []):
-        if x == "" and y == "":
-            x = self.get_start_pos[0]
-            y = self.get_start_pos[1]
-        elif (x, y) not in traversed:
-            traversed.append((x, y))
-            currPath.append((x, y))
-            self.move(x, y, (128, 128, 128))
-            self.restore(x, y)
+    def Solve(x = None, y = None, currPath = None, traversed = None):
+        if currPath is None:
+            currPath = []
+        if traversed is None:
+            traversed = set()
 
-        if self.at_end():
-            path = currPath
-            return path
-        else:
-            m = self.get_possible_moves[x, y]
-            for i in range(m):
-                Solve(self, m[i][0], m[i][1], currPath)
-                currPath.RemoveAt(currPath.Count - 1)
-    def __run__(self):
-        self.Solve()
+        if x is None and y is None:
+            x, y = maze.get_start_pos()
+        if (x, y) in traversed:
+            return False
+        
+        traversed.add((x, y))
+        currPath.append((x, y))
+        maze.move(x, y, (128, 128, 128))
+        maze.restore(x, y)
 
-        if path == []:
-            print("Uh-oh. No valid path found.")
-            return path
+        if maze.at_end(x, y):
+            path[:] = currPath
+            return True
+        
+        for m in maze.get_possible_moves(x, y):
+            if Solve(m[0], m[1], currPath, traversed):
+                return True
+        
+        currPath.pop()
+        return False
     
-    __run__()
+    if not Solve():
+        print("Uh-oh. No valid path found.")
+    
+    return path
 
 def get_path(log, filename):
     """ Do not change this function """
