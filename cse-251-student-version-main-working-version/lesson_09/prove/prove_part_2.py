@@ -21,11 +21,14 @@ position:
 
 What would be your strategy?
 
-<Answer here>
+My first thought is to use memoization to have the recursive sections keep track of their paths,
+then return those paths if they reach the end
 
 Why would it work?
 
-<Answer here>
+It reaches the end by taking a step at a time, so it forms a complete path. With proper memoization
+it's easy to keep track of each step along the way, so it's not much more
+work to output the ending path(s).
 
 """
 
@@ -81,14 +84,40 @@ def get_color():
 # TODO: Add any function(s) you need, if any, here.
 
 
+
+def solve_path(maze, traversed, color, x = None, y = None):
+    global stop
+
+    if x is None and y is None:
+        x, y = maze.get_start_pos()
+    if (x, y) in traversed:
+        return
+    
+    traversed.add((x, y))
+
+    if maze.at_end(x, y):
+        stop = True
+    
+    options = maze.get_possible_moves(x, y)
+
+    maze.move(x, y, color)
+
+    if len(options) == 1:
+        solve_path(maze, traversed, color, options[0][0], options[0][1])
+    else:
+        for m in options:
+            if (not stop):
+                solve_path(maze, traversed, get_color(), m[0], m[1])
+
+
 def solve_find_end(maze):
     """ Finds the end position using threads. Nothing is returned. """
     # When one of the threads finds the end position, stop all of them.
     global stop
     stop = False
+    traversed = set()
 
-
-
+    solve_path(maze, traversed, get_color())
 
 def find_end(log, filename, delay):
     """ Do not change this function """
