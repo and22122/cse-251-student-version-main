@@ -87,6 +87,8 @@ def get_color():
 
 def solve_path(maze, traversed, color, x = None, y = None):
     global stop
+    global threads
+    global thread_count
 
     if x is None and y is None:
         x, y = maze.get_start_pos()
@@ -102,12 +104,20 @@ def solve_path(maze, traversed, color, x = None, y = None):
 
     maze.move(x, y, color)
 
-    if len(options) == 1:
-        solve_path(maze, traversed, color, options[0][0], options[0][1])
-    else:
-        for m in options:
-            if (not stop):
-                solve_path(maze, traversed, get_color(), m[0], m[1])
+    
+    threads_to_join = []
+    for m in options:
+        if (not stop):
+            if len(options) == 1:
+                threads.append(threading.Thread(target=solve_path, args=(maze, traversed, color, m[0], m[1])))
+                thread_count += 1
+            else:
+                threads.append(threading.Thread(target=solve_path, args=(maze, traversed, get_color(), m[0], m[1])))
+                thread_count += 1
+            threads[-1].start()
+    
+    for t in threads_to_join:
+        t.join()
 
 
 def solve_find_end(maze):
@@ -116,6 +126,8 @@ def solve_find_end(maze):
     global stop
     stop = False
     traversed = set()
+    global threads
+    threads = []
 
     solve_path(maze, traversed, get_color())
 
