@@ -15,6 +15,7 @@ import threading
 import random
 import string
 import os
+import mmap
 
 # -----------------------------------------------------------------------------
 def reverse_file_non_mmap(filename):
@@ -23,8 +24,15 @@ def reverse_file_non_mmap(filename):
         last char will be next, etc...
     """
     # TODO add code here
-    pass
+    accum = ""
 
+    with open(filename, mode="r") as file:
+        lines = file.readlines()
+
+        for i in range(len(lines)):
+            accum += lines[-i - 1][::-1]
+        
+        print(accum)
 
 # -----------------------------------------------------------------------------
 def reverse_file(filename):
@@ -32,6 +40,10 @@ def reverse_file(filename):
         The last char will be displayed first, then the second
         last char will be next, etc...
     """
+    with open(filename) as file:
+        with mmap.mmap(file.fileno(), length=0, access=mmap.ACCESS_READ) as map_file:
+            for i in range(map_file.size()):
+                print(chr(map_file[-i - 1]), end='')
     # TODO add code here
     pass
 
@@ -46,11 +58,16 @@ def promote_letter_a(filename):
     You are not creating a different file.  Change the file using mmap file.
     """
     # TODO add code here
+    with open(filename) as file:
+        with mmap.mmap(file.fileno(), length=0, access=mmap.ACCESS_READ) as map_file:
+            for i in range(map_file.size()):
+                if map_file[i] == 'a':
+                    map_file[i] = 'A'
     pass
 
 
 # -----------------------------------------------------------------------------
-def promote_letter_a_threads(filename):
+def promote_letter_a_threads(filename, n):
     """ 
     change the given file with these rules:
     1) when the letter is 'a', uppercase it
@@ -61,6 +78,19 @@ def promote_letter_a_threads(filename):
     Use N threads to process the file where each thread will be 1/N of the file.
     """
     # TODO add code here
+    def processLetters(mfile, start, end, step):
+        for i in range(start, end, step):
+            if mfile[i] == 'a':
+                mfile[i] = 'A'
+            else:
+                mfile[i] = '.'
+    
+    threads = []
+
+    with open(filename) as file:
+        with mmap.mmap(file.fileno(), length=0, access=mmap.ACCESS_READ) as map_file:
+            for i in range(n):
+                threads.append(threading.Thread(target=processLetters, args=(map_file, i, map_file.size(), n)))
     pass
 
 
