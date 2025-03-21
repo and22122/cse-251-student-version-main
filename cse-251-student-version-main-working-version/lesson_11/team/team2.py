@@ -50,7 +50,8 @@ class Queue_t:
         self.items = []
     
     def size(self):
-        return len(self.items)
+        with self.isAvailable:
+            return len(self.items)
     
     def get(self, item):
         with self.isAvailable:
@@ -90,10 +91,11 @@ class Stack_t:
 class Queue_p:
     def __init__(self):
         self.isAvailable = mp.Lock()
-        self.items = []
+        self.items = mp.Manager().list()
     
     def size(self):
-        return len(self.items)
+        with self.isAvailable:
+            return len(self.items)
     
     def get(self, item):
         with self.isAvailable:
@@ -113,8 +115,8 @@ class Queue_p:
 # -------------------------------------------------------------------
 class Stack_p:
     def __init__(self):
-        self.isAvailable = threading.Lock()
-        self.items = []
+        self.isAvailable = mp.Lock()
+        self.items = mp.Manager().list()
     
     def push(self, item):
         with self.isAvailable:
