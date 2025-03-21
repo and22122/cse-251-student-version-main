@@ -45,25 +45,101 @@ import multiprocessing as mp
 
 # -------------------------------------------------------------------
 class Queue_t:
-    pass
+    def __init__(self):
+        self.isAvailable = threading.Lock()
+        self.items = []
+    
+    def size(self):
+        return len(self.items)
+    
+    def get(self, item):
+        with self.isAvailable:
+            if (self.size() > 0):
+                    output = self.items[0]
+                    self.items = self.items[1:]
+                    return output
+            else:
+                print("You cannot use \"get(self, item)\" on an empty queue.")
+                raise IndexError
+    
+    def put(self, item):
+        with self.isAvailable:
+            self.items.append(item)
 
 
 # -------------------------------------------------------------------
 class Stack_t:
-    pass
+    def __init__(self):
+        self.isAvailable = threading.Lock()
+        self.items = []
+    
+    def push(self, item):
+        with self.isAvailable:
+            self.items.append(item)
+    
+    def pop(self):
+        with self.isAvailable:
+            if len(self.items) > 0:
+                    return self.items.pop()
+            else:
+                print("You cannot use \"pop()\" on an empty stack.")
+                raise IndexError
 
 
 # -------------------------------------------------------------------
 class Queue_p:
-    pass
+    def __init__(self):
+        self.isAvailable = mp.Lock()
+        self.items = []
+    
+    def size(self):
+        return len(self.items)
+    
+    def get(self, item):
+        with self.isAvailable:
+            if (self.size() > 0):
+                    output = self.items[0]
+                    self.items = self.items[1:]
+                    return output
+            else:
+                print("You cannot use \"get(self, item)\" on an empty queue.")
+                raise IndexError
+    
+    def put(self, item):
+        with self.isAvailable:
+            self.items.append(item)
 
 
 # -------------------------------------------------------------------
 class Stack_p:
-    pass
+    def __init__(self):
+        self.isAvailable = threading.Lock()
+        self.items = []
+    
+    def push(self, item):
+        with self.isAvailable:
+            self.items.append(item)
+    
+    def pop(self):
+        with self.isAvailable:
+            if len(self.items) > 0:
+                    return self.items.pop()
+            else:
+                print("You cannot use \"pop()\" on an empty stack.")
+                raise IndexError
+
+def tputter():
+    counter = 0
+    while counter < 
 
 
 def main():
+    tq = Queue_t()
+    ts = Stack_t()
+    pq = Queue_p()
+    ps = Stack_p()
+
+
     pass
 
 
