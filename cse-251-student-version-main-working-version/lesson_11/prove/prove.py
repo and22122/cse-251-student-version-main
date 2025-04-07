@@ -37,7 +37,7 @@ def guest_partying(id, count):
     print(f'Guest: {id}, count = {count}')
     time.sleep(random.uniform(0, 1))
 
-def cleaner():
+def cleaner(cLock, gLock):
     """
     do the following for TIME seconds
         cleaner will wait to try to clean the room (cleaner_waiting())
@@ -46,9 +46,17 @@ def cleaner():
         Take some time cleaning (cleaner_cleaning())
         display message STOPPING_CLEANING_MESSAGE
     """
-    pass
+    start = time.time
 
-def guest():
+    while time.time <= start + TIME:
+        cleaner_waiting()
+        with cLock:
+            print(STARTING_CLEANING_MESSAGE)
+            cleaner_cleaning()
+            print(STOPPING_CLEANING_MESSAGE)
+            
+
+def guest(cLock, gLock, guestNum):
     """
     do the following for TIME seconds
         guest will wait to try to get access to the room (guest_waiting())
@@ -57,6 +65,10 @@ def guest():
         Take some time partying (call guest_partying())
         display message STOPPING_PARTY_MESSAGE if the guest is the last one leaving in the room
     """
+    start = time.time
+    while time.time <= start + TIME:
+        guest_waiting()
+        
     pass
 
 def main():
@@ -65,6 +77,9 @@ def main():
 
     # TODO - add any variables, data structures, processes you need
     # TODO - add any arguments to cleaner() and guest() that you need
+    party_lock = mp.Lock()
+    cleaning_lock = mp.Lock()
+    current_guests = 
 
     # Results
     print(f'Room was cleaned {cleaned_count} times, there were {party_count} parties')
@@ -72,4 +87,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    mp.Value(int, 0)
 
