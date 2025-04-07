@@ -2,7 +2,7 @@
 Course: CSE 251
 Lesson Week: 10
 File: assignment.py
-Author: <your name>
+Author: Jalen Anderson
 
 Purpose: assignment for week 10 - reader writer problem
 
@@ -65,6 +65,51 @@ BUFFER_SIZE = 10
 READERS = 2
 WRITERS = 2
 
+# Ouroboros = buffer + head, tail, values written, values read
+#             buffer,   -4,   -3,        -2,            -1
+def Writer(li, itemMax, emptySlots, filledSlots, lock):
+    while True:
+        head = li[-4]
+        tail = li[-3]
+        inserted = li[-2]
+
+        if inserted >= itemMax:
+            with lock:
+                while (tail + 1) % BUFFER_SIZE != head:
+                    li[tail] = -1
+                    filledSlots.release()
+                    tail = (tail + 1) % BUFFER_SIZE
+                li[-3] = tail
+            break
+
+        emptySlots.acquire()
+
+        with lock:
+            if (tail + 1) % BUFFER_SIZE != head:
+                li[-2] += 1
+                li[tail] = inserted + 1
+                li[-3] = (tail + 1) % BUFFER_SIZE
+        
+        filledSlots.release()
+
+def Reader(li, itemMax, emptySlots, filledSlots, lock):
+    while True:
+        filledSlots.acquire()
+
+        with lock:
+            head = li[-4]
+
+            if li[head] == -1:
+                break
+            
+            value = li[head]
+            
+            print(value, end=', ', flush=True)
+            li[-4] = (head + 1) % BUFFER_SIZE
+            li[-1] += 1
+
+        emptySlots.release()
+
 def main():
 
     # This is the number of values that the writer will send to the reader
@@ -84,11 +129,27 @@ def main():
     #        track of the number of values received by the readers.
     #        (ie., [0] * (BUFFER_SIZE + 4))
 
+    # Buffer + head, tail, values written, values read
+    ouroboros = smm.ShareableList([0] * BUFFER_SIZE + [0, 0, 0, 0])
+
     # TODO - Create any lock(s) or semaphore(s) that you feel you need
+    emptied = mp.Semaphore(BUFFER_SIZE)
+    filled = mp.Semaphore(0)
+    pad = mp.Lock()
 
     # TODO - create reader and writer processes
-
+    processes = []
+    for i in range(WRITERS):
+        processes.append(mp.Process(target=Writer, args=(ouroboros, items_to_send, emptied, filled, pad)))
+    for i in range(READERS):
+        processes.append(mp.Process(target=Reader, args=(ouroboros, items_to_send, emptied, filled, pad)))
     # TODO - Start the processes and wait for them to finish
+
+    for p in processes:
+        p.start()
+    
+    for p in processes:
+        p.join()
 
     print(f'{items_to_send} values sent')
 
@@ -96,6 +157,8 @@ def main():
     #        Can not use "items_to_send", must be a value collected
     #        by the reader processes.
     # print(f'{<your variable>} values received')
+
+    print(f'{ouroboros[-1]} values received')
 
     smm.shutdown()
 
